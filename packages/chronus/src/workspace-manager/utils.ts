@@ -49,7 +49,19 @@ export async function tryLoadPythonPackage(
   if (await isPathAccessible(host, pyprojectPath)) {
     try {
       const file = await host.readFile(pyprojectPath);
-      const config: any = parse(file.content);
+      interface PyProjectConfig {
+        project?: {
+          name?: string;
+          version?: string;
+        };
+        tool?: {
+          poetry?: {
+            name?: string;
+            version?: string;
+          };
+        };
+      }
+      const config: PyProjectConfig = parse(file.content);
       
       // Try PEP 621 format first
       if (config.project?.name) {
@@ -57,7 +69,7 @@ export async function tryLoadPythonPackage(
           name: config.project.name,
           version: config.project.version || "0.0.0",
           relativePath: relativePath,
-          manifest: {}, // Python packages don't use package.json structure
+          manifest: {} as any, // Python packages don't use package.json structure
         };
       }
       
@@ -67,7 +79,7 @@ export async function tryLoadPythonPackage(
           name: config.tool.poetry.name,
           version: config.tool.poetry.version || "0.0.0",
           relativePath: relativePath,
-          manifest: {},
+          manifest: {} as any,
         };
       }
     } catch {
@@ -76,6 +88,8 @@ export async function tryLoadPythonPackage(
   }
 
   // Try setup.py (legacy Python packaging)
+  // Note: This uses simple regex patterns which may not handle all Python syntax variations
+  // (e.g., multi-line strings, f-strings, variables). This is a best-effort approach.
   const setupPyPath = resolvePath(root, relativePath, "setup.py");
   if (await isPathAccessible(host, setupPyPath)) {
     try {
@@ -91,7 +105,7 @@ export async function tryLoadPythonPackage(
           name: nameMatch[1],
           version: versionMatch?.[1] || "0.0.0",
           relativePath: relativePath,
-          manifest: {},
+          manifest: {} as any,
         };
       }
     } catch {
