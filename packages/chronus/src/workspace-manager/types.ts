@@ -1,4 +1,4 @@
-export type WorkspaceType = "npm" | "pnpm" | "rush";
+export type WorkspaceType = "npm" | "pnpm" | "rush" | "python";
 
 export interface Workspace {
   readonly type: WorkspaceType;

@@ -46,6 +46,10 @@ describe("getWorkspaceManager", () => {
     );
   }
 
+  function makePythonWorkspace() {
+    host.addFile("proj/setup.py", "from setuptools import setup\nsetup(name='test')");
+  }
+
   describe("auto", () => {
     it("finds pnpm workspace", async () => {
       makePnpmWorkspace();
@@ -62,6 +66,11 @@ describe("getWorkspaceManager", () => {
       const workspace = await loadWorkspace(host.host, "proj", "auto");
       expect(workspace.type).toBe("npm");
     });
+    it("finds python workspace", async () => {
+      makePythonWorkspace();
+      const workspace = await loadWorkspace(host.host, "proj", "auto");
+      expect(workspace.type).toBe("python");
+    });
 
     it("finds pnpm workspace over npm workspace", async () => {
       makeNpmWorkspace();
@@ -76,6 +85,13 @@ describe("getWorkspaceManager", () => {
       const workspace = await loadWorkspace(host.host, "proj", "auto");
       expect(workspace.type).toBe("rush");
     });
+
+    it("finds npm workspace over python workspace", async () => {
+      makePythonWorkspace();
+      makeNpmWorkspace();
+      const workspace = await loadWorkspace(host.host, "proj", "auto");
+      expect(workspace.type).toBe("npm");
+    });
   });
 
   describe("forced", () => {
@@ -83,6 +99,7 @@ describe("getWorkspaceManager", () => {
       makeNpmWorkspace();
       makeRushWorkspace();
       makePnpmWorkspace();
+      makePythonWorkspace();
     });
     it("finds pnpm workspace", async () => {
       makePnpmWorkspace();
@@ -98,6 +115,11 @@ describe("getWorkspaceManager", () => {
       makeNpmWorkspace();
       const workspace = await loadWorkspace(host.host, "proj", "npm");
       expect(workspace.type).toBe("npm");
+    });
+    it("finds python workspace", async () => {
+      makePythonWorkspace();
+      const workspace = await loadWorkspace(host.host, "proj", "python");
+      expect(workspace.type).toBe("python");
     });
   });
 });

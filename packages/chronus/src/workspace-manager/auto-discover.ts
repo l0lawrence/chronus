@@ -1,6 +1,7 @@
 import { ChronusError, type ChronusHost } from "../utils/index.js";
 import { createNpmWorkspaceManager } from "./npm.js";
 import { createPnpmWorkspaceManager } from "./pnpm.js";
+import { createPythonWorkspaceManager } from "./python.js";
 import { createRushWorkspaceManager } from "./rush.js";
 import type { Workspace, WorkspaceManager, WorkspaceType } from "./types.js";
 
@@ -8,6 +9,7 @@ async function findWorkspaceManager(host: ChronusHost, root: string): Promise<Wo
   const npm = createNpmWorkspaceManager(host);
   const pnpm = createPnpmWorkspaceManager(host);
   const rush = createRushWorkspaceManager(host);
+  const python = createPythonWorkspaceManager(host);
 
   if (await pnpm.is(root)) {
     return pnpm;
@@ -15,6 +17,8 @@ async function findWorkspaceManager(host: ChronusHost, root: string): Promise<Wo
     return rush;
   } else if (await npm.is(root)) {
     return npm;
+  } else if (await python.is(root)) {
+    return python;
   } else {
     throw new ChronusError("Couldn't figure out the workspace type.");
   }
@@ -32,6 +36,8 @@ export async function getWorkspaceManager(
       return createPnpmWorkspaceManager(host);
     case "rush":
       return createRushWorkspaceManager(host);
+    case "python":
+      return createPythonWorkspaceManager(host);
     case "auto":
     case undefined:
       return findWorkspaceManager(host, root);
