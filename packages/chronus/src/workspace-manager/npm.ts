@@ -1,14 +1,14 @@
 import { parse } from "yaml";
 import { ChronusError, joinPaths, type ChronusHost } from "../utils/index.js";
-import type { Package, PackageJson, Workspace, WorkspaceManager } from "./types.js";
+import type { Package, PackageJson, PatchPackageVersion, Workspace, WorkspaceManager } from "./types.js";
 import { findPackagesFromPattern } from "./utils.js";
 
 const workspaceFileName = "package.json";
 
-export function createNpmWorkspaceManager(host: ChronusHost): WorkspaceManager {
+export function createNpmWorkspaceManager(): WorkspaceManager {
   return {
     type: "npm",
-    async is(dir: string): Promise<boolean> {
+    async is(host: ChronusHost, dir: string): Promise<boolean> {
       try {
         const workspaceFilePath = joinPaths(dir, workspaceFileName);
         const file = await host.readFile(workspaceFilePath);
@@ -18,7 +18,7 @@ export function createNpmWorkspaceManager(host: ChronusHost): WorkspaceManager {
         return false;
       }
     },
-    async load(root: string): Promise<Workspace> {
+    async load(host: ChronusHost, root: string): Promise<Workspace> {
       const workspaceFilePath = joinPaths(root, workspaceFileName);
 
       const file = await host.readFile(workspaceFilePath);
@@ -38,6 +38,15 @@ export function createNpmWorkspaceManager(host: ChronusHost): WorkspaceManager {
         path: root,
         packages,
       };
+    },
+    async updateVersionsForPackage(
+      host: ChronusHost,
+      workspace: Workspace,
+      pkg: Package,
+      patchRequest: PatchPackageVersion,
+    ): Promise<void> {
+      // TODO: Implement version update for npm packages
+      throw new ChronusError("updateVersionsForPackage not yet implemented for npm");
     },
   };
 }

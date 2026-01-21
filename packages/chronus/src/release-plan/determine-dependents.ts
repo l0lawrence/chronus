@@ -53,7 +53,7 @@ export function applyDependents({
         let type: VersionType | undefined;
 
         const dependent = dependentPackage.name;
-        const dependencyVersionRanges = getDependencyVersionRanges(dependentPackage.manifest, nextRelease);
+        const dependencyVersionRanges = getDependencyVersionRanges(dependentPackage.manifest || {}, nextRelease);
 
         for (const { depType, versionRange } of dependencyVersionRanges) {
           if (nextRelease.type === "none") {

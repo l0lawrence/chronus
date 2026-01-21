@@ -19,6 +19,7 @@ export async function findUnpublishedPackages(tarballs: string[]): Promise<(Pack
         version: manifest.version,
         manifest,
         tarballPath: tarball,
+        dependencies: new Map(), // Empty dependencies for tarball packages
       };
       return [packageBase, await isPackageVersionPublished(manifest.name, manifest.version)] as const;
     }),

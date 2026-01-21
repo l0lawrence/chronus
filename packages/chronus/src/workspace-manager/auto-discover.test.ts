@@ -37,6 +37,7 @@ describe("getWorkspaceManager", () => {
       }),
     );
   }
+
   function makeNpmWorkspace() {
     host.addFile(
       "proj/package.json",

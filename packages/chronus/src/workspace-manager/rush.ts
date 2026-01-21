@@ -1,6 +1,6 @@
 import { parse } from "yaml";
 import { ChronusError, isDefined, isPathAccessible, joinPaths, lookup, type ChronusHost } from "../utils/index.js";
-import type { Package, Workspace, WorkspaceManager } from "./types.js";
+import type { Package, PatchPackageVersion, Workspace, WorkspaceManager } from "./types.js";
 import { tryLoadNodePackage } from "./utils.js";
 
 const workspaceFileName = "rush.json";
@@ -15,13 +15,13 @@ interface RushProject {
   readonly shouldPublish?: boolean;
 }
 
-export function createRushWorkspaceManager(host: ChronusHost): WorkspaceManager {
+export function createRushWorkspaceManager(): WorkspaceManager {
   return {
     type: "rush",
-    async is(dir: string): Promise<boolean> {
+    async is(host: ChronusHost, dir: string): Promise<boolean> {
       return isPathAccessible(host, joinPaths(dir, workspaceFileName));
     },
-    async load(dir: string): Promise<Workspace> {
+    async load(host: ChronusHost, dir: string): Promise<Workspace> {
       const root = await lookup(dir, (current) => {
         const path = joinPaths(current, workspaceFileName);
         return isPathAccessible(host, path);
@@ -48,6 +48,15 @@ export function createRushWorkspaceManager(host: ChronusHost): WorkspaceManager 
         path: root,
         packages,
       };
+    },
+    async updateVersionsForPackage(
+      host: ChronusHost,
+      workspace: Workspace,
+      pkg: Package,
+      patchRequest: PatchPackageVersion,
+    ): Promise<void> {
+      // TODO: Implement version update for rush packages
+      throw new ChronusError("updateVersionsForPackage not yet implemented for rush");
     },
   };
 }

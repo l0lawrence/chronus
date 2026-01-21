@@ -62,7 +62,7 @@ export function getDependencyGraph(
   for (const pkg of queue) {
     const { name } = pkg;
     const dependencies = [];
-    const allDependencies = getAllDependencies(pkg.manifest);
+    const allDependencies = getAllDependencies(pkg.manifest || {});
 
     for (const [depName, originalDepRange] of allDependencies) {
       let repRange = originalDepRange;
